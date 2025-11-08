@@ -229,13 +229,13 @@ public class StoreHelper: ObservableObject {
     /// Products.plist configuration file to get a list of `ProductId` that defines the set of products we'll request
     /// from the App Store. Your app must call `StoreHelper.start()` as soon as possible after StoreHelper has
     /// been initialized.
-    public init() {
+    public init(config: [String: AnyObject] = [:]) {
         
         // Add a helper for StoreKit1-based direct purchases from the app store (IAP promotions)
         appStoreHelper = AppStoreHelper(storeHelper: self)
         
         // Read our list of product ids
-        productIds = storeConfiguration.readConfigFile()
+        productIds = storeConfiguration.readConfiguration(config: config)
         
         // Read the hosts Configuration.plist file that overrides our default values
         configurationOverride = readConfigurationOverride()

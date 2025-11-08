@@ -99,14 +99,23 @@ public class StoreConfiguration {
             return nil
         }
         
-        guard result.count > 0 else {
+        return readConfiguration(config: result)
+    }
+    
+    /// Read the contents of the product definition property list (e.g. `Products.plist`).
+    /// - Returns: Returns a set of ProductId if the list was read, nil otherwise.
+    public func readConfiguration(config: [String: AnyObject] = [:]) -> OrderedSet<ProductId>? {
+        if productIdsCache != nil { return productIdsCache!.count > 0 ? productIdsCache : nil }
+        
+
+        guard config.count > 0 else {
             StoreLog.event(.configurationEmpty)
             StoreLog.event(.configurationFailure)
             return nil
         }
         
         // Read the "Products" list. This can contain consumable, non-consumable and subscription products
-        guard let values = result[StoreConstants.ProductsConfiguration] as? [String] else {
+        guard let values = config[StoreConstants.ProductsConfiguration] as? [String] else {
             StoreLog.event(.configurationEmpty)
             StoreLog.event(.configurationFailure)
             return nil
@@ -114,7 +123,7 @@ public class StoreConfiguration {
         
         // Do we have an optional "Subscriptions" list?
         productIdsCache = OrderedSet<ProductId>(values.compactMap { $0 })
-        if let subscriptions = result[StoreConstants.SubscriptionsConfiguration] as? [[String : AnyObject]] {
+        if let subscriptions = config[StoreConstants.SubscriptionsConfiguration] as? [[String : AnyObject]] {
             for subscriptionGroup in subscriptions {
                 if subscriptionGroup[StoreConstants.SubscriptionGroupConfiguration] is String {
                     if let subscriptionsInGroup = subscriptionGroup[StoreConstants.ProductsConfiguration] as? [String] {
